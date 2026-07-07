@@ -38,9 +38,6 @@ export default function Navbar() {
             alt="iDeals"
             className="h-9 w-auto transition-transform group-hover:scale-105"
           />
-          <span className="text-xl font-semibold tracking-tight text-gray-900 hidden sm:block">
-            iDeals
-          </span>
         </Link>
 
         <ul className="hidden md:flex items-center gap-1 text-sm font-medium text-gray-600">

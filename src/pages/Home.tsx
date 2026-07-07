@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import VideoShowcase from "@/components/VideoShowcase";
 import VideoMasonryGrid from "@/components/VideoMasonryGrid";
+import HowItWorks from "@/components/HowItWorks";
 import { buildWhatsAppUrl } from "@/lib/format";
 import { api, type Product } from "@/lib/api";
 
@@ -135,13 +136,6 @@ export default function Home() {
                 View products
                 <ArrowRight size={16} />
               </Link>
-              <Link
-                to="/product/iphone-17-pro"
-                className="inline-flex items-center gap-2 h-12 px-7 rounded-full bg-primary text-white text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl"
-              >
-                <Sparkles size={16} />
-                Check installment
-              </Link>
               <a
                 href={buildWhatsAppUrl(
                   "Hello iDeals, I'd like to chat about a product.",
@@ -168,7 +162,9 @@ export default function Home() {
         </div>
       </section>
 
-      <VideoShowcase />
+      {/* <VideoShowcase /> */}
+
+      <HowItWorks />
 
       <section className="mx-auto max-w-7xl px-6 sm:px-8 py-8">
         <div className="rounded-2xl overflow-hidden shadow-lg">
@@ -228,43 +224,6 @@ export default function Home() {
             </div>
           )}
         </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 sm:px-8 pb-20 sm:pb-24">
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-primary bg-primary/5 px-3 py-1 rounded-full">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Complete your ecosystem
-            </div>
-            <h2 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight text-gray-900">
-              Significant others.
-            </h2>
-          </div>
-          <Link
-            to="/products"
-            className="hidden sm:inline-flex items-center gap-1 text-sm text-primary hover:gap-2 transition-all"
-          >
-            Shop accessories
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        {accessories.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {accessories.map((p, i) => (
-              <ProductCard key={p.productId} product={p} index={i} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-gray-400 bg-gray-50/50 rounded-2xl border border-gray-100/80">
-            <div className="text-4xl mb-3">🔌</div>
-            <p className="font-medium text-gray-600">
-              No accessories available
-            </p>
-            <p className="text-sm mt-1">Check back soon for new accessories</p>
-          </div>
-        )}
       </section>
 
       <VideoMasonryGrid />
