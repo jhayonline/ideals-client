@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ShieldCheck, Truck, BadgeCheck, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
+import VideoShowcase from "@/components/VideoShowcase";
+import VideoMasonryGrid from "@/components/VideoMasonryGrid";
 import { buildWhatsAppUrl } from "@/lib/format";
 import { api, type Product } from "@/lib/api";
 
@@ -30,22 +32,40 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Get specific iPhone models by exact name matching
+  // Get one representative phone per generation: 17 Pro Max, 16, 13, 11
   const getFeaturedPhones = (allProducts: Product[]): Product[] => {
-    // Look for these exact product names in the database
-    const targetNames = [
-      "iPhone 11 Pro",
-      "iPhone 13 Pro",
-      "iPhone 16 Pro",
-      "iPhone 17 Pro",
+    const specs: { model: string; prefer: (name: string) => boolean }[] = [
+      { model: "17", prefer: (n) => /pro max/i.test(n) },
+      { model: "13", prefer: (n) => !/pro/i.test(n) },
+      { model: "15", prefer: (n) => !/pro/i.test(n) },
+      { model: "12", prefer: (n) => !/pro/i.test(n) },
     ];
 
-    const featured = allProducts.filter((p) =>
-      targetNames.some((name) => p.name.includes(name)),
-    );
+    const featured: Product[] = [];
 
-    if (featured.length === 0) {
-      return allProducts.filter((p) => p.category === "iPhone").slice(0, 4);
+    for (const spec of specs) {
+      const candidates = allProducts.filter(
+        (p) =>
+          p.model === spec.model &&
+          !featured.some((f) => f.productId === p.productId),
+      );
+      const match =
+        candidates.find((p) => spec.prefer(p.name)) ?? candidates[0];
+      if (match) featured.push(match);
+    }
+
+    // Fallback: fill any remaining slots with other iPhones if a generation
+    // wasn't found in the catalog
+    if (featured.length < 4) {
+      for (const p of allProducts) {
+        if (featured.length >= 4) break;
+        if (
+          p.category === "iPhone" &&
+          !featured.some((f) => f.productId === p.productId)
+        ) {
+          featured.push(p);
+        }
+      }
     }
 
     return featured;
@@ -124,6 +144,8 @@ export default function Home() {
         </div>
       </section>
 
+      <VideoShowcase />
+
       <section className="mx-auto max-w-7xl px-5 sm:px-8 py-12">
         <div className="rounded-3xl overflow-hidden">
           <img
@@ -201,6 +223,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <VideoMasonryGrid />
 
       <section className="relative mx-auto max-w-7xl px-5 sm:px-8 pb-24">
         <div className="relative rounded-3xl overflow-hidden">

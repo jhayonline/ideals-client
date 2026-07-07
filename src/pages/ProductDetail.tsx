@@ -1,29 +1,55 @@
-import { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, MessageCircle, ChevronLeft } from "lucide-react";
-import { getProduct, type Product, type ColorVariant } from "@/data/products";
 import { formatGHS, buildWhatsAppUrl } from "@/lib/format";
 import InstallmentCalculator, {
   type InstallmentSelection,
 } from "@/components/InstallmentCalculator";
+import { api, type Product } from "@/lib/api";
+
+type ColorVariant = { name: string; hex: string; image: string };
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const product = getProduct(id!);
 
-  const [selectedColor, setSelectedColor] = useState(
-    product?.colors[0] || null,
-  );
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedColor, setSelectedColor] = useState<ColorVariant | null>(null);
   const [installment, setInstallment] = useState<InstallmentSelection | null>(
     null,
   );
+
+  useEffect(() => {
+    if (!id) return;
+
+    setLoading(true);
+
+    api
+      .getProductById(id)
+      .then((res) => {
+        if (res.success) {
+          setProduct(res.data);
+          setSelectedColor(res.data.colors?.[0] ?? null);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch product:", err))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="mx-auto max-w-3xl px-5 py-32 text-center">
         <h1 className="text-3xl font-semibold">Product not found</h1>
+
         <Link to="/products" className="mt-4 inline-block text-primary">
           ← Back to shop
         </Link>
@@ -31,9 +57,15 @@ export default function ProductDetail() {
     );
   }
 
-  const waMessage = `Hello iDeals 👋\nI'd like to buy:\n*${product.name}* — ${selectedColor?.name}\nPrice: ${formatGHS(product.price)}${
+  const waMessage = `Hello iDeals 👋\nI'd like to buy:\n*${product.name}* — ${
+    selectedColor?.name
+  }\nPrice: ${formatGHS(product.price)}${
     installment
-      ? `\nInstallment: ${installment.deposit}% deposit (${formatGHS(installment.depositAmount)}) + ${installment.installments} × ${formatGHS(installment.perPayment)} ${installment.plan}`
+      ? `\nInstallment: ${installment.deposit}% deposit (${formatGHS(
+          installment.depositAmount,
+        )}) + ${installment.installments} × ${formatGHS(
+          installment.perPayment,
+        )} ${installment.plan}`
       : ""
   }`;
 
@@ -63,6 +95,7 @@ export default function ProductDetail() {
               />
             </AnimatePresence>
           </div>
+
           <div className="mt-4 grid grid-cols-4 gap-3">
             {product.colors.map((c: ColorVariant) => (
               <button
@@ -89,15 +122,18 @@ export default function ProductDetail() {
           <p className="text-xs uppercase tracking-wider text-primary font-medium">
             {product.category}
           </p>
+
           <h1 className="mt-2 text-4xl sm:text-5xl font-semibold">
             {product.name}
           </h1>
+
           <p className="mt-3 text-lg text-gray-600">{product.tagline}</p>
 
           <div className="mt-6 flex items-baseline gap-3">
             <span className="text-3xl font-semibold">
               {formatGHS(product.price)}
             </span>
+
             {product.badge && (
               <span
                 className={`text-[10px] uppercase font-medium tracking-wider px-2.5 py-1 rounded-full ${
@@ -113,12 +149,11 @@ export default function ProductDetail() {
 
           {/* Color picker */}
           <div className="mt-8">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium">
-                Color —{" "}
-                <span className="text-gray-500">{selectedColor?.name}</span>
-              </span>
+            <div className="mb-3 text-sm font-medium">
+              Color —{" "}
+              <span className="text-gray-500">{selectedColor?.name}</span>
             </div>
+
             <div className="flex gap-3">
               {product.colors.map((c: ColorVariant) => (
                 <button
@@ -146,7 +181,7 @@ export default function ProductDetail() {
             ))}
           </ul>
 
-          {/* Installment calc */}
+          {/* Installment */}
           {product.badge === "Installment Available" && (
             <div className="mt-8">
               <InstallmentCalculator
@@ -171,6 +206,7 @@ export default function ProductDetail() {
               <MessageCircle size={16} />
               {product.inStock ? "Buy on WhatsApp" : "Out of stock"}
             </a>
+
             <a
               href={buildWhatsAppUrl(
                 `Hello iDeals, I have a question about ${product.name}.`,
