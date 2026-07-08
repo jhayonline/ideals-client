@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatGHS } from "@/lib/format";
-import { Calendar, Clock, Percent } from "lucide-react";
+import { Calendar, Percent } from "lucide-react";
 
 type Deposit = 40 | 60;
 type Plan = "weekly" | "monthly";

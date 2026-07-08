@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { products, type Product } from "@/data/products";
+import { products, type Product as LocalProduct } from "@/data/products";
 import ProductCard, { ProductCardSkeleton } from "@/components/ProductCard";
-import { Search, Filter, Grid, List } from "lucide-react";
+import { Search } from "lucide-react";
 
-const categories: Array<Product["category"] | "All"> = [
+const categories: Array<LocalProduct["category"] | "All"> = [
   "All",
   "iPhone",
   "Accessory",
@@ -15,13 +15,29 @@ export default function Products() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const items = products.filter((p) => {
-    const matchesCategory = cat === "All" || p.category === cat;
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.tagline.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // Map local Product to the shape expected by ProductCard
+  const items = products
+    .filter((p) => {
+      const matchesCategory = cat === "All" || p.category === cat;
+      const matchesSearch =
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    })
+    .map((p) => ({
+      id: p.id,
+      productId: p.id,
+      name: p.name,
+      tagline: p.tagline,
+      category: p.category,
+      price: p.price,
+      badge: p.badge || null, // Convert undefined to null
+      inStock: p.inStock,
+      colors: p.colors,
+      gallery: p.gallery,
+      highlights: p.highlights,
+      model: p.model,
+    }));
 
   const handleCategoryChange = (category: (typeof categories)[number]) => {
     setLoading(true);
@@ -83,7 +99,7 @@ export default function Products() {
               <ProductCardSkeleton key={i} />
             ))
           : items.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i} />
+              <ProductCard key={p.productId} product={p} index={i} />
             ))}
       </div>
 

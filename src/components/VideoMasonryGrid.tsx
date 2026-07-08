@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Play, VolumeX, X, Maximize2 } from "lucide-react";
+import { Play, VolumeX, X } from "lucide-react";
 
 import handoverShowcase from "@/assets/Videos/handover-showcase.mov";
 import installmentClip from "@/assets/Videos/iphone-14-pro-max-installment.mp4";

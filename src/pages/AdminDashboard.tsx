@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Package, Plus, Trash2, Pencil, LogOut, Tag } from "lucide-react";
 import { formatGHS } from "@/lib/format";
 import { api, type Product } from "@/lib/api";

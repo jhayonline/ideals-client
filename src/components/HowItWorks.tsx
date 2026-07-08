@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Package,
@@ -59,17 +59,48 @@ const steps = [
 export default function HowItWorks() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [progressKey, setProgressKey] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const advance = () => setActiveIndex((i) => (i + 1) % steps.length);
+  const advance = () => {
+    setActiveIndex((i) => (i + 1) % steps.length);
+    setProgressKey((k) => k + 1);
+  };
+
+  // Handle auto-advance with timeout
+  useEffect(() => {
+    if (paused) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      return;
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      advance();
+    }, STEP_DURATION);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [activeIndex, paused]);
+
   const active = steps[activeIndex];
   const ActiveIcon = active.icon;
 
   return (
     <section className="relative mx-auto max-w-7xl px-6 sm:px-8 py-20 sm:py-28">
       <style>{`
-        @keyframes howitworks-fill { from { width: 0% } to { width: 100% } }
+        @keyframes howitworks-fill { 
+          from { width: 0% } 
+          to { width: 100% } 
+        }
         @keyframes howitworks-fade {
-          from { opacity: 0; transform: translateY(6px) }
+          from { opacity: 0; transform: translateY(8px) }
           to { opacity: 1; transform: translateY(0) }
         }
         .howitworks-progress {
@@ -107,7 +138,10 @@ export default function HowItWorks() {
           return (
             <button
               key={index}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => {
+                setActiveIndex(index);
+                setProgressKey((k) => k + 1);
+              }}
               className="group text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               <div className="flex items-center gap-2 mb-3">
@@ -135,8 +169,7 @@ export default function HowItWorks() {
               <div className="h-1 rounded-full bg-gray-100 overflow-hidden">
                 {isActive && (
                   <div
-                    key={activeIndex}
-                    onAnimationEnd={advance}
+                    key={`progress-${progressKey}`}
                     className={`howitworks-progress h-full rounded-full bg-primary ${
                       paused ? "paused" : ""
                     }`}
@@ -214,7 +247,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Right: claim-ticket visual, themed on the physical pickup ticket */}
+        {/* Right: claim-ticket visual */}
         <div className="flex justify-center lg:justify-end">
           <div
             key={`ticket-${activeIndex}`}

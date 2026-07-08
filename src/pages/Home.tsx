@@ -4,12 +4,10 @@ import {
   Truck,
   BadgeCheck,
   MessageCircle,
-  Sparkles,
   ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import VideoShowcase from "@/components/VideoShowcase";
 import VideoMasonryGrid from "@/components/VideoMasonryGrid";
 import HowItWorks from "@/components/HowItWorks";
 import { buildWhatsAppUrl } from "@/lib/format";
@@ -82,15 +80,6 @@ export default function Home() {
 
     return featured;
   };
-
-  const accessories = products.filter((p) => {
-    return (
-      p.category === "Accessory" ||
-      p.category === "Watch" ||
-      p.category === "iPad" ||
-      p.category === "AirPods"
-    );
-  });
 
   const featuredPhones = getFeaturedPhones(products);
 

@@ -16,5 +16,11 @@ const app = (
   </StrictMode>
 );
 
-// https://bun.com/docs/bundler/hot-reloading\#import-meta-hot-data
-(import.meta.hot.data.root ??= createRoot(elem)).render(app);
+// Handle hot reloading safely
+const root = createRoot(elem);
+root.render(app);
+
+// For hot module replacement (if available)
+if (import.meta.hot) {
+  import.meta.hot.data.root = root;
+}

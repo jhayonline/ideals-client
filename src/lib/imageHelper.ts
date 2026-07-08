@@ -1,7 +1,6 @@
 export const getProductImagePath = (
   productName: string,
   colorName: string,
-  model: string,
 ): string => {
   const basePath = `/src/assets`;
 
@@ -204,7 +203,7 @@ export const getProductImagePath = (
 // Helper to get product image for display
 export const getProductImage = (product: any, colorName?: string): string => {
   if (colorName) {
-    return getProductImagePath(product.name, colorName, product.model);
+    return getProductImagePath(product.name, colorName);
   }
 
   // Try to get from colors array first
@@ -217,5 +216,5 @@ export const getProductImage = (product: any, colorName?: string): string => {
   }
 
   // Fallback to generated path
-  return getProductImagePath(product.name, "Blue", product.model);
+  return getProductImagePath(product.name, "Blue");
 };
